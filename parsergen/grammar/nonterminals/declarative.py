@@ -33,6 +33,12 @@ def get_lefts(generalized: Iterable):
             yield (item, *tail)
 
 
+def nonterminal_base():
+    return NonTerminalMeta(
+        "RootNonTerminal", (), {"__root__": True}
+    )
+
+
 class NonTerminalMeta(type):
 
     __abstract: bool
@@ -78,7 +84,8 @@ class NonTerminalMeta(type):
                 origin = get_origin(hint)
                 args = get_args(hint)
                 _args = ", ".join(
-                    arg if isinstance(arg, str) else arg.__name__ for arg in args
+                    arg if isinstance(arg, str) else arg.__name__
+                    for arg in args
                 )
                 args_repr = f"[{_args}]" if args else ""
                 print(f"  {name}: {origin}{args_repr}")
@@ -90,59 +97,3 @@ class NonTerminalMeta(type):
                 productions.append((nonterminal, left))
             print()
         return productions
-
-
-def nonterminal_base():
-    return NonTerminalMeta(
-        "RootNonTerminal", (), {"__root__": True}
-    )
-
-
-NonTerminal = nonterminal_base()
-
-
-class Expr(NonTerminal):
-    expr: Union[Add, Mul, Unary, Exp, Operand]
-
-
-class Add(NonTerminal):
-    left: Union[Add, Mul, Unary, Exp, Operand]
-    op: Literal["+"]
-    right: Union[Mul, Unary, Exp, Operand]
-
-
-class Mul(NonTerminal):
-    left: Union[Mul, Unary, Exp, Operand]
-    op: Literal["*"]
-    right: Union[Unary, Exp, Operand]
-
-
-class Unary(NonTerminal):
-    sign: Literal["-"]
-    operand: Union[Operand, Exp]
-
-
-class Exp(NonTerminal):
-    left: Operand
-    op: Literal["**"]
-    right: Union[Exp, Unary, Operand]
-
-
-class Operand(NonTerminal):
-    means: Union[Number, Parenthised]
-
-
-class Parenthised(NonTerminal):
-    left_paren: Literal["("]
-    expr: Expr
-    right_paren: Literal[")"]
-
-
-class Number:
-    pass
-
-
-for nt, rule in NonTerminal.get_productions():
-    print(nt, "->", " ".join(map(str, rule)))
-
-# e = Expr(Operand(Number()))

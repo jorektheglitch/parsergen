@@ -1,5 +1,4 @@
 import sys
-from abc import ABC
 
 from typing import Any, Dict, Optional, Tuple, Type, overload
 
