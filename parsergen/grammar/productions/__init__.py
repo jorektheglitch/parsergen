@@ -22,6 +22,9 @@ class Rule(Generic[Terminal, Nonterminal]):
     def __iter__(self):
         return iter(self.symbols)
 
+    def __reversed__(self) -> Iterable[Union[Terminal, Nonterminal]]:
+        return reversed(self.symbols)
+
     def __str__(self) -> str:
         items = (
             repr(item) if isinstance(item, str) else str(item)
