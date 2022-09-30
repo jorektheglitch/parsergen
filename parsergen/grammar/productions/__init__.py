@@ -21,6 +21,9 @@ class Rule(Reversible[Union[Terminal, Nonterminal]], Generic[Terminal, Nontermin
 
     def __iter__(self):
         return iter(self.symbols)
+    
+    def __len__(self):
+        return len(self.symbols)
 
     def __reversed__(self) -> Iterator[Union[Terminal, Nonterminal]]:
         return reversed(self.symbols)
