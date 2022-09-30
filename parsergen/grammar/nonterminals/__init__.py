@@ -19,19 +19,11 @@ class NonTerminalBase(NonTerminalMeta):
     _name: str
     args: Tuple
 
-    @overload
-    def __new__(mcls: Type[Self], name: str, bases: Tuple[Type, ...], attrs: Dict[str, Any]) -> Self: ...
-    @overload
-    def __new__(mcls: Type[Self], name: str) -> Self: ...
     def __new__(mcls, name: str, bases: Optional[_Bases] = None, attrs: Optional[_Attrs] = None):
         bases = bases or ()
         attrs = attrs or {}
         return super().__new__(mcls, name, bases, attrs)
 
-    @overload
-    def __init__(self, name: str, bases: Tuple[Type, ...], attrs: Dict[str, Any]): ...
-    @overload
-    def __init__(self, name: str): ...
     def __init__(self, name: str, bases: Optional[_Bases] = None, attrs: Optional[_Attrs] = None) -> None:
         bases = bases or ()
         attrs = attrs or {}
