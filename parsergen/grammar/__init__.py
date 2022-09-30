@@ -27,3 +27,14 @@ class Grammar(Generic[Terminal, Nonterminal]):
     nonterminals: Set[Nonterminal]
     start_symbol: Nonterminal
     productions: Productions[Terminal, Nonterminal]
+
+    def __post_init__(self):
+        symbols = self.terminals | self.nonterminals
+        if self.start_symbol not in self.nonterminals:
+            raise InvalidStartSymbol(symbol)
+        for production in self.productions:
+            if production.left not in self.nonterminals:
+                raise InvalidProduction(production, production.left)
+            for symbol in production.right:
+                if symbol not in symbols:
+                    raise InvalidProduction(production, symbol)
