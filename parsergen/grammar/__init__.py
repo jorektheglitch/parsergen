@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
-from typing import FrozenSet, Generic, TypeVar
+from typing import FrozenSet, Generic, Iterable, TypeVar
 
 from .nonterminals import NonTerminalBase, is_epsilon_generating
-from .productions import Productions
+from .productions import Production, Productions
 
 
 Terminal = TypeVar("Terminal")
@@ -28,6 +28,19 @@ class Grammar(Generic[Terminal, Nonterminal]):
     nonterminals: FrozenSet[Nonterminal]
     start_symbol: Nonterminal
     productions: Productions[Terminal, Nonterminal]
+
+    def __init__(
+        self,
+        terminals: Iterable[Terminal],
+        nonterminals: Iterable[Nonterminal],
+        start_symbol: Nonterminal,
+        productions: Iterable[Production[Terminal, Nonterminal]]
+    ) -> None:
+        super().__init__()
+        self.terminals = frozenset(terminals)
+        self.nonterminals = frozenset(nonterminals)
+        self.start_symbol = start_symbol
+        self.productions = Productions(productions)
 
     def __post_init__(self):
         symbols = self.terminals | self.nonterminals
