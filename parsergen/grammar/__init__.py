@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from typing import Generic, Set, TypeVar
 
-from .nonterminals import NonTerminalBase
+from .nonterminals import NonTerminalBase, is_epsilon_generating
 from .productions import Productions
 
 
@@ -38,3 +38,20 @@ class Grammar(Generic[Terminal, Nonterminal]):
             for symbol in production.right:
                 if symbol not in symbols:
                     raise InvalidProduction(production, symbol)
+
+    @property
+    def has_left_recursion(self) -> bool:
+        for nonterminal in self.nonterminals:
+            derivations_leads = []
+            for production in self.productions.lhs_filter(nonterminal):
+                for symbol in production.right:
+                    if isinstance(symbol, NonTerminalBase):
+                        if symbol not in derivations_leads:
+                            derivations_leads.append(symbol)
+                        if not is_epsilon_generating(symbol, self.productions):
+                            break
+                    else:
+                        break
+            if nonterminal in derivations_leads:
+                return True
+        return False
