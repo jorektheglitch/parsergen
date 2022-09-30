@@ -58,3 +58,13 @@ class Productions(Generic[Terminal, Nonterminal], List[Production[Terminal, Nont
         if item not in self:
             return super().append(item)
         return None
+
+    def lhs_filter(self, nt: Nonterminal):
+        for production in self:
+            if production.left == nt:
+                yield production
+    
+    def rhs_filter(self, symbol: Union[Terminal, Nonterminal]):
+        for production in self:
+            if symbol in production.right:
+                yield production
