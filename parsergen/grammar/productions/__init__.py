@@ -16,6 +16,9 @@ class Rule(Generic[Terminal, Nonterminal]):
     def __init__(self, symbols: Iterable[Union[Terminal, Nonterminal]]):
         self.symbols = tuple(symbols)
 
+    def __getitem__(self, index):
+        return self.symbols[index]
+
     def __iter__(self):
         return iter(self.symbols)
 
