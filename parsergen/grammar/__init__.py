@@ -41,11 +41,9 @@ class Grammar(Generic[Terminal, Nonterminal]):
         self.nonterminals = frozenset(nonterminals)
         self.start_symbol = start_symbol
         self.productions = Productions(productions)
-
-    def __post_init__(self):
         symbols = self.terminals | self.nonterminals
         if self.start_symbol not in self.nonterminals:
-            raise InvalidStartSymbol(symbol)
+            raise InvalidStartSymbol(self.start_symbol)
         for production in self.productions:
             if production.left not in self.nonterminals:
                 raise InvalidProduction(production, production.left)
