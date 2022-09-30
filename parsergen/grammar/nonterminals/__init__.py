@@ -2,10 +2,7 @@ import sys
 
 from typing import Any, Dict, Optional, Tuple, Type, overload
 
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
+from parsergen.grammar.productions import Productions
 
 from .declarative import NonTerminalMeta
 
@@ -65,3 +62,7 @@ class Nonterminal(NonTerminalBase):
 start = SpecialNonterminal("S")
 epsilon = SpecialNonterminal("ε")
 eof = SpecialNonterminal("EOF")
+
+
+def is_epsilon_generating(nt: NonTerminalBase, productions: Productions) -> bool:
+    raise NotImplementedError
