@@ -1,8 +1,9 @@
-import sys
+from __future__ import annotations
 
-from typing import Any, Dict, Optional, Tuple, Type, overload
-
-from parsergen.grammar.productions import Productions
+from typing import Any, Dict, Optional, Tuple, Type
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from parsergen.grammar.productions import Productions
 
 from .declarative import NonTerminalMeta
 
