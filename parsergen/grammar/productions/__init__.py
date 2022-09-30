@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from typing import Generic, Iterable, List, Tuple, TypeVar, Union
+from typing import Generic, Iterable, Iterator, List, Reversible, Tuple, TypeVar, Union
 
 from parsergen.grammar.nonterminals import NonTerminalBase
 
@@ -9,7 +9,7 @@ Terminal = TypeVar("Terminal")
 Nonterminal = TypeVar("Nonterminal", bound=NonTerminalBase)
 
 
-class Rule(Generic[Terminal, Nonterminal]):
+class Rule(Reversible[Union[Terminal, Nonterminal]], Generic[Terminal, Nonterminal]):
 
     symbols: Tuple[Union[Terminal, Nonterminal], ...]
 
@@ -22,7 +22,7 @@ class Rule(Generic[Terminal, Nonterminal]):
     def __iter__(self):
         return iter(self.symbols)
 
-    def __reversed__(self) -> Iterable[Union[Terminal, Nonterminal]]:
+    def __reversed__(self) -> Iterator[Union[Terminal, Nonterminal]]:
         return reversed(self.symbols)
 
     def __str__(self) -> str:
