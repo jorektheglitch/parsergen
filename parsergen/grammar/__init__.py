@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from typing import Generic, Set, TypeVar
+from typing import FrozenSet, Generic, TypeVar
 
 from .nonterminals import NonTerminalBase, is_epsilon_generating
 from .productions import Productions
@@ -23,8 +23,9 @@ class InvalidProduction(Exception):
 
 
 class Grammar(Generic[Terminal, Nonterminal]):
-    terminals: Set[Terminal]
-    nonterminals: Set[Nonterminal]
+
+    terminals: FrozenSet[Terminal]
+    nonterminals: FrozenSet[Nonterminal]
     start_symbol: Nonterminal
     productions: Productions[Terminal, Nonterminal]
 
