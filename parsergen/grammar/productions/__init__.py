@@ -16,12 +16,17 @@ class Rule(Reversible[Union[Terminal, Nonterminal]], Generic[Terminal, Nontermin
     def __init__(self, symbols: Iterable[Union[Terminal, Nonterminal]]):
         self.symbols = tuple(symbols)
 
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Rule):
+            return self.symbols == other.symbols
+        return NotImplemented
+
     def __getitem__(self, index):
         return self.symbols[index]
 
     def __iter__(self):
         return iter(self.symbols)
-    
+
     def __len__(self):
         return len(self.symbols)
 
