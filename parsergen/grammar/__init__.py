@@ -1,11 +1,11 @@
-from dataclasses import dataclass
+from abc import abstractmethod
+from typing import Collection, FrozenSet, Generic, ItemsView, Iterable, KeysView, Protocol, Tuple, TypeVar, Union, ValuesView, overload
 
-from typing import FrozenSet, Generic, Iterable, TypeVar
-
-from .nonterminals import NonTerminalBase, is_epsilon_generating
+from .nonterminals import NonTerminalBase, SpecialNonterminal, is_epsilon_generating
 from .productions import Production, Productions
 
 
+T = TypeVar("T")
 Terminal = TypeVar("Terminal")
 Nonterminal = TypeVar("Nonterminal", bound=NonTerminalBase)
 
@@ -20,6 +20,34 @@ class InvalidProduction(Exception):
     def __init__(self, production, violator):
         msg = f"Production {production} is incorrect due to contains symbol {violator} which is not in terminals and nonterminals sets."
         super().__init__(msg)
+
+
+class FirstsSet(
+    # TODO: fix mypy warning:
+    #       Invariant type variable "Terminal" used in protocol where covariant
+    #       one is expected
+    Collection[Union[Terminal, SpecialNonterminal]],
+    Iterable[Union[Terminal, SpecialNonterminal]],
+    Protocol[Terminal]
+):
+    pass
+
+
+class TerminalSets(
+    Protocol[Terminal, Nonterminal]
+):
+    # It is actually a copy-paste from typing.Mapping class
+    # MUST be same as Mapping[Nonterminal, FirstsSet[Terminal]]
+    @abstractmethod
+    def __getitem__(self, __key: Nonterminal) -> FirstsSet[Terminal]: ...
+    @overload
+    def get(self, __key: Nonterminal) -> Union[FirstsSet[Terminal], None]: ...
+    @overload
+    def get(self, __key: Nonterminal, default: Union[FirstsSet[Terminal], T]) -> Union[FirstsSet[Terminal], T]: ...
+    def items(self) -> ItemsView[Nonterminal, FirstsSet[Terminal]]: ...
+    def keys(self) -> KeysView[Nonterminal]: ...
+    def values(self) -> ValuesView[FirstsSet[Terminal]]: ...
+    def __contains__(self, __o: object) -> bool: ...
 
 
 class Grammar(Generic[Terminal, Nonterminal]):
