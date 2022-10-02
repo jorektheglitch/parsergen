@@ -71,6 +71,9 @@ class Grammar(Generic[Terminal, Nonterminal]):
         self.nonterminals = frozenset(nonterminals)
         self.start_symbol = start_symbol
         self.productions = Productions(productions)
+        self._validate()
+
+    def _validate(self) -> None:
         symbols = self.terminals | self.nonterminals
         if self.start_symbol not in self.nonterminals:
             raise InvalidStartSymbol(self.start_symbol)
