@@ -56,6 +56,8 @@ class Grammar(Generic[Terminal, Nonterminal]):
     nonterminals: FrozenSet[Nonterminal]
     start_symbol: Nonterminal
     productions: Productions[Terminal, Nonterminal]
+    firsts: TerminalSets[Terminal, Nonterminal]
+    follows: TerminalSets[Terminal, Nonterminal]
 
     def __init__(
         self,
