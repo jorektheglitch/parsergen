@@ -1,6 +1,8 @@
 from abc import abstractmethod
+from types import MappingProxyType
 from typing import Collection, FrozenSet, Generic, Iterable, Protocol, Tuple, TypeVar, Union, overload
 
+from .algorythms import get_firsts_follows
 from .nonterminals import NonTerminalBase, SpecialNonterminal, is_epsilon_generating
 from .productions import Production, Productions
 
@@ -72,6 +74,9 @@ class Grammar(Generic[Terminal, Nonterminal]):
         self.start_symbol = start_symbol
         self.productions = Productions(productions)
         self._validate()
+        firsts, follows = get_firsts_follows(self)
+        self.firsts = MappingProxyType(firsts)
+        self.follows = MappingProxyType(follows)
 
     def _validate(self) -> None:
         symbols = self.terminals | self.nonterminals
