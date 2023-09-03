@@ -9,6 +9,8 @@ from parsergen.grammar import Grammar
 from parsergen.grammar.nonterminals import NonTerminalBase, epsilon, eof
 from parsergen.grammar.productions import Production
 
+from .base import Parser
+
 
 StateNo = NewType("StateNo", int)
 Terminal = TypeVar("Terminal")
@@ -36,9 +38,9 @@ class Shift(Action):
 
 
 @dataclass
-class Reduce(Action):
+class Reduce(Action, Generic[Terminal, Nonterminal]):
 
-    production: Production
+    production: Production[Terminal, Nonterminal]
 
     def __repr__(self):
         cls = type(self)
@@ -57,12 +59,12 @@ class Result(Action, Generic[Nonterminal]):
         return "Accept"
 
 
-class LRParser(ABC, Generic[Terminal, Nonterminal]):
+class LRParser(Parser[Terminal, Nonterminal], ABC, Generic[Terminal, Nonterminal]):
 
     actions_table: Mapping[StateNo, Mapping[Terminal, Any]]
     goto_table: Mapping[StateNo, Mapping[Nonterminal, Any]]
 
-    stack: List[Tuple[StateNo, Union[Terminal, Nonterminal, Tuple[Nonterminal, Tuple[Union[Terminal, Nonterminal], ...]]]]]
+    stack: List[Tuple[StateNo, Union[Terminal, Nonterminal]]]
     state: StateNo
 
     def __init__(
@@ -77,30 +79,11 @@ class LRParser(ABC, Generic[Terminal, Nonterminal]):
         self.stack = [*stack]
         self.state = state
 
-    @abstractmethod
-    @classmethod
-    def get_tables(
-        cls, grammar: Grammar[T, NT]
-    ) -> Tuple[Mapping[StateNo, Mapping[T, Any]], Mapping[StateNo, Mapping[NT, Any]]]:
-        pass
-
-    @abstractmethod
-    def parse(self, incoming: Iterable[Terminal]):
-        pass
-
-    @abstractmethod
-    def finalize(self):
-        pass
-
 
 class LR0Parser(LRParser[Terminal, Nonterminal], Generic[Terminal, Nonterminal]):
 
-    actions_table: Mapping[StateNo, Mapping[Terminal, Union[Shift, Reduce]]]
+    actions_table: Mapping[StateNo, Mapping[Terminal, Union[Shift, Reduce[Terminal, Nonterminal]]]]
     goto_table: Mapping[StateNo, Mapping[Nonterminal, StateNo]]
-
-    @classmethod
-    def get_tables(cls, grammar: Grammar):  # TODO
-        pass
 
     def parse(self, stream: Iterable[Terminal]) -> None:
         stream = iter(stream)
@@ -109,7 +92,7 @@ class LR0Parser(LRParser[Terminal, Nonterminal], Generic[Terminal, Nonterminal])
             while not accept_incoming:
                 accept_incoming = self._parsing_step(symbol)
 
-    def _parsing_step(self, incoming: Terminal):
+    def _parsing_step(self, incoming: Terminal) -> bool:
         accept_incoming = False
         stack = self.stack
         state = self.state
@@ -129,8 +112,8 @@ class LR0Parser(LRParser[Terminal, Nonterminal], Generic[Terminal, Nonterminal])
             for _ in rule:
                 state, symbol = stack.pop()
                 buff.append(symbol)
-            new = nt, tuple(reversed(buff))  # noqa
-            stack.append((state, nt))
+            new = nt(*reversed(buff))
+            stack.append((state, new))
             print(self.state, "->", state)
             self.state = self.goto_table[state][nt]
             print(state, "->", self.state)
@@ -143,3 +126,7 @@ class LR0Parser(LRParser[Terminal, Nonterminal], Generic[Terminal, Nonterminal])
 
 class LR1Parser(LRParser):
     pass
+
+
+def lr0_parsing_tables(grammar: Grammar[Terminal, Nonterminal]):
+    raise NotImplementedError
