@@ -45,6 +45,24 @@ def clean_grammar(
     return cleaned_grammar
 
 
+def get_epsilonless_grammar(
+    grammar: Grammar[Terminal, Nonterminal]
+) -> Grammar[Terminal, Nonterminal]:
+    raise NotImplementedError
+
+
+def get_nonleftrecursive_grammar(
+    grammar: Grammar[Terminal, Nonterminal]
+) -> Grammar[Terminal, Nonterminal]:
+    raise NotImplementedError
+
+
+def get_nonlong_grammar(
+    grammar: Grammar[Terminal, Nonterminal]
+) -> Grammar[Terminal, Nonterminal]:
+    raise NotImplementedError
+
+
 def get_generating_nts(
     grammar: Grammar[Terminal, Nonterminal]
 ) -> Set[Nonterminal]:
